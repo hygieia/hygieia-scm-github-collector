@@ -1,4 +1,4 @@
-## Hygieia collector for Github
+## Hygieia collector for Github SCM
 
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Build Status](https://travis-ci.com/Hygieia/hygieia-scm-github-collector.svg?branch=master)](https://travis-ci.com/Hygieia/hygieia-scm-github-collector)

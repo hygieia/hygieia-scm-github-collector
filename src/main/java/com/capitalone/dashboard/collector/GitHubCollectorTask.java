@@ -123,17 +123,24 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
      */
     @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts") // agreed, fixme
     private void clean(Collector collector) {
+    	logBanner("IN CLEAN ....");
+    	LOG.info("CollectorName and ID " + collector.getName() + " & " + collector.getId());
         Set<ObjectId> uniqueIDs = new HashSet<>();
         /**
          * Logic: For each component, retrieve the collector item list of the type SCM.
          * Store their IDs in a unique set ONLY if their collector IDs match with GitHub collectors ID.
          */
         for (com.capitalone.dashboard.model.Component comp : dbComponentRepository.findAll()) {
+        	LOG.info("In comp");
+        	LOG.info(comp.getName());
             if (comp.getCollectorItems() != null && !comp.getCollectorItems().isEmpty()) {
-                List<CollectorItem> itemList = comp.getCollectorItems().get(CollectorType.SCM);
+            	LOG.info("In collector Items");
+                List<CollectorItem> itemList = comp.getCollectorItems().get(CollectorType.SCM);                
                 if (itemList != null) {
+                	LOG.info("SCM Collection Not Null");
                     for (CollectorItem ci : itemList) {
-                        if (ci != null && ci.getCollectorId().equals(collector.getId())) {
+                    	if (ci != null && ci.getCollectorId().equals(collector.getId())) {
+                        	LOG.info("Unique IDs added");
                             uniqueIDs.add(ci.getId());
                         }
                     }
@@ -149,9 +156,11 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
         Set<ObjectId> gitID = new HashSet<>();
         gitID.add(collector.getId());
         for (GitHubRepo repo : gitHubRepoRepository.findByCollectorIdIn(gitID)) {
+        	LOG.info("In repo " + repo.getRepoUrl());
             if (repo.isPushed()) {continue;}
-
-            repo.setEnabled(uniqueIDs.contains(repo.getId()));
+            boolean isEnabled = uniqueIDs.contains(repo.getId());
+            LOG.info("IsEnabled " + isEnabled);
+            repo.setEnabled(isEnabled);
             repoList.add(repo);
         }
         gitHubRepoRepository.save(repoList);
@@ -189,6 +198,7 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
          }
             
          for (GitHubRepo repo : enabledRepos(collector)) {
+        	 
             if (repo.getErrorCount() < gitHubSettings.getErrorThreshold()) {
                 boolean firstRun = ((repo.getLastUpdated() == 0) || ((start - repo.getLastUpdated()) > FOURTEEN_DAYS_MILLISECONDS));
                 repo.removeLastUpdateDate();  //moved last update date to collector item. This is to clean old data.
@@ -196,7 +206,7 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
                     LOG.info(repo.getOptions().toString() + "::" + repo.getBranch() + ":: get commits");
                     // Step 1: Get all the commits
                     for (Commit commit : gitHubClient.getCommits(repo, firstRun, commitExclusionPatterns)) {
-                        LOG.debug(commit.getTimestamp() + ":::" + commit.getScmCommitLog());
+                        LOG.info(commit.getTimestamp() + ":::" + commit.getScmCommitLog());
                         if (isNewCommit(repo, commit)) {
                             commit.setCollectorItemId(repo.getId());
                             commitRepository.save(commit);
@@ -309,7 +319,7 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
                 .orElseGet(Collections::emptyList).stream()
                 .filter(pulledRepo -> !pulledRepo.isPushed())
                 .collect(Collectors.toList());
-
+        LOG.info("IS Empty " + CollectionUtils.isEmpty(pulledRepos));
         if (CollectionUtils.isEmpty(pulledRepos)) { return new ArrayList<>(); }
 
         return pulledRepos;

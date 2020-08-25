@@ -1,5 +1,7 @@
 package com.capitalone.dashboard.collector;
 
+import com.capitalone.dashboard.client.RestClientSettings;
+import com.capitalone.dashboard.client.RestOperationsSupplier;
 import com.capitalone.dashboard.misc.HygieiaException;
 import com.capitalone.dashboard.model.Comment;
 import com.capitalone.dashboard.model.Commit;
@@ -11,7 +13,6 @@ import com.capitalone.dashboard.model.GitRequest;
 import com.capitalone.dashboard.model.Review;
 import com.capitalone.dashboard.util.Encryption;
 import com.capitalone.dashboard.util.EncryptionException;
-import com.capitalone.dashboard.util.Supplier;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -63,9 +64,10 @@ public class DefaultGitHubClient implements GitHubClient {
 
     @Autowired
     public DefaultGitHubClient(GitHubSettings settings,
-                               Supplier<RestOperations> restOperationsSupplier) {
+                               RestOperationsSupplier restOperationsSupplier,
+                               RestClientSettings restClientSettings) {
         this.settings = settings;
-        this.restOperations = restOperationsSupplier.get();
+        this.restOperations = restOperationsSupplier.get(restClientSettings);
     }
 
     /**

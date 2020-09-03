@@ -261,12 +261,6 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
         log("Finished", start);
     }
 
-    @Override
-    public int getCount() {
-        return count.get();
-    }
-
-
     private int processList(GitHubRepo repo, List<GitRequest> entries, String type) {
         int count = 0;
         if (CollectionUtils.isEmpty(entries)) return 0;

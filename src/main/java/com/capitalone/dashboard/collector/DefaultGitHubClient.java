@@ -1,6 +1,5 @@
 package com.capitalone.dashboard.collector;
 
-import com.capitalone.dashboard.client.RestClientSettings;
 import com.capitalone.dashboard.client.RestOperationsSupplier;
 import com.capitalone.dashboard.misc.HygieiaException;
 import com.capitalone.dashboard.model.Comment;
@@ -64,10 +63,9 @@ public class DefaultGitHubClient implements GitHubClient {
 
     @Autowired
     public DefaultGitHubClient(GitHubSettings settings,
-                               RestOperationsSupplier restOperationsSupplier,
-                               RestClientSettings restClientSettings) {
+                               RestOperationsSupplier restOperationsSupplier) {
         this.settings = settings;
-        this.restOperations = restOperationsSupplier.get(restClientSettings);
+        this.restOperations = restOperationsSupplier.get();
     }
 
     /**

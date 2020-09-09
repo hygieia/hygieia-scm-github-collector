@@ -1,6 +1,7 @@
 package com.capitalone.dashboard.collector;
 
 
+import com.capitalone.dashboard.client.RestOperationsSupplier;
 import com.capitalone.dashboard.misc.HygieiaException;
 import com.capitalone.dashboard.model.CollectionError;
 import com.capitalone.dashboard.model.Collector;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -57,6 +59,7 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
     private static final long FOURTEEN_DAYS_MILLISECONDS = 14 * 24 * 60 * 60 * 1000;
     private static final String API_RATE_LIMIT_MESSAGE = "API rate limit exceeded";
     private List<Pattern> commitExclusionPatterns = new ArrayList<>();
+    private AtomicInteger count = new AtomicInteger(0);
 
     @Autowired
     public GitHubCollectorTask(TaskScheduler taskScheduler,
@@ -254,10 +257,9 @@ public class GitHubCollectorTask extends CollectorTask<Collector> {
         log("New Commits", start, commitCount);
         log("New Pulls", start, pullCount);
         log("New Issues", start, issueCount);
-
+        count.set(commitCount);
         log("Finished", start);
     }
-
 
     private int processList(GitHubRepo repo, List<GitRequest> entries, String type) {
         int count = 0;

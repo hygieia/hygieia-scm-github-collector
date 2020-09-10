@@ -144,8 +144,23 @@
   </dependencies>
 
   <build>
-    <defaultGoal>clean verify apache-rat:check japicmp:cmp checkstyle:check spotbugs:check javadoc:javadoc</defaultGoal>
-    <finalName>${project.artifactId}</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/version.properties</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/version.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <finalName>${artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -158,37 +173,6 @@
         <configuration>
           <source>${java.compilation.source}</source>
           <target>${java.compilation.target}</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.github.siom79.japicmp</groupId>
-        <artifactId>japicmp-maven-plugin</artifactId>
-        <version>0.13.1</version>
-        <configuration>
-          <oldVersion>
-            <dependency>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>${project.artifactId}</artifactId>
-              <version>${bc.version}</version>
-              <type>jar</type>
-            </dependency>
-          </oldVersion>
-          <newVersion>
-            <file>
-              <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
-            </file>
-          </newVersion>
-          <parameter>
-            <onlyModified>true</onlyModified>
-            <breakBuildOnBinaryIncompatibleModifications>${japicmp.breakBuildOnBinaryIncompatibleModifications}</breakBuildOnBinaryIncompatibleModifications>
-            <breakBuildOnSourceIncompatibleModifications>${japicmp.breakBuildOnSourceIncompatibleModifications}</breakBuildOnSourceIncompatibleModifications>
-            <!-- skip japicmp on "mvn site" - use "mvn package site" to include report -->
-            <ignoreMissingNewVersion>true</ignoreMissingNewVersion>
-            <reportOnlyFilename>true</reportOnlyFilename>
-            <skipPomModules>true</skipPomModules>
-            <ignoreMissingClasses>false</ignoreMissingClasses>
-          </parameter>
-          <skip>${japicmp.skip}</skip>
         </configuration>
       </plugin>
       <plugin>
@@ -219,10 +203,9 @@
         <version>${apache.rat.plugin.version}</version>
         <configuration>
           <excludes>
-            <exclude>**.tests/**</exclude>
-            <exclude>**logs/**</exclude>
-            <exclude>**site-content/**</exclude>
-            <exclude>RELEASE-NOTES.txt</exclude>
+            <exclude>.tests/**</exclude>
+            <exclude>.tests/**</exclude>
+            <exclude>logs/**</exclude>
             <exclude>src/test/resources/org/tmatesoft/svn/test/apache.config.template</exclude>
             <exclude>src/test/resources/org/tmatesoft/svn/test/test.properties.template</exclude>
             <exclude>src/test/resources/org/tmatesoft/svn/test/svnserve.config.template</exclude>
@@ -245,23 +228,6 @@
             <ruleset>src/devops/pmd.xml</ruleset>
           </rulesets>
           <targetJdk>${java.compilation.target}</targetJdk>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.spotify</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>1.2.2</version>
-        <configuration>
-          <skipDockerBuild>false</skipDockerBuild>
-          <imageName>hygieia-scm-github-collector</imageName>
-          <dockerDirectory>${project.basedir}/docker</dockerDirectory>
-          <resources>
-            <resource>
-              <targetPath>/</targetPath>
-              <directory>${project.build.directory}</directory>
-              <include>${project.build.finalName}.jar</include>
-            </resource>
-          </resources>
         </configuration>
       </plugin>
       <plugin>
@@ -367,7 +333,9 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>${maven.javadoc.plugin.version}</version>
         <configuration>
-          <extdirs>src/test</extdirs>
+          <failOnError>false</failOnError>
+          <failOnWarnings>false</failOnWarnings>
+          <excludes>**/*Test*.java</excludes>
         </configuration>
       </plugin>
       <plugin>
@@ -403,30 +371,6 @@
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-maven-plugin</artifactId>
         <version>0.13.1</version>
-        <configuration>
-          <oldVersion>
-            <dependency>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>${project.artifactId}</artifactId>
-              <version>${bc.version}</version>
-              <type>jar</type>
-            </dependency>
-          </oldVersion>
-          <newVersion>
-            <file>
-              <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
-            </file>
-          </newVersion>
-          <parameter>
-            <onlyModified>true</onlyModified>
-            <breakBuildOnBinaryIncompatibleModifications>${japicmp.breakBuildOnBinaryIncompatibleModifications}</breakBuildOnBinaryIncompatibleModifications>
-            <breakBuildOnSourceIncompatibleModifications>${japicmp.breakBuildOnSourceIncompatibleModifications}</breakBuildOnSourceIncompatibleModifications>
-            <!-- skip japicmp on "mvn site" - use "mvn package site" to include report -->
-            <skipPomModules>true</skipPomModules>
-            <ignoreMissingNewVersion>true</ignoreMissingNewVersion>
-            <reportOnlyFilename>true</reportOnlyFilename>
-          </parameter>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
@@ -434,10 +378,8 @@
         <version>${apache.rat.plugin.version}</version>
         <configuration>
           <excludes>
-            <exclude>**.tests/**</exclude>
-            <exclude>**logs/**</exclude>
-            <exclude>**site-content/**</exclude>
-            <exclude>RELEASE-NOTES.txt</exclude>
+            <exclude>.tests/**</exclude>
+            <exclude>logs/**</exclude>
             <exclude>src/test/resources/org/tmatesoft/svn/test/apache.config.template</exclude>
             <exclude>src/test/resources/org/tmatesoft/svn/test/test.properties.template</exclude>
             <exclude>src/test/resources/org/tmatesoft/svn/test/svnserve.config.template</exclude>
@@ -491,7 +433,7 @@
           <template>release-notes.vm</template>
           <templateDirectory>src/changes</templateDirectory>
           <issueLinkTemplatePerSystem>
-            <github>http://github.com/Hygieia/hygieia-scm-github-collector/issues/%ISSUE%</github>
+            <github>http://github.com/Hygieia/${repository.name}/issues/%ISSUE%</github>
           </issueLinkTemplatePerSystem>
         </configuration>
         <reportSets>
@@ -596,28 +538,73 @@
       </build>
     </profile>
     <profile>
-      <id>test-deploy</id>
-      <properties>
-        <altDeploymentRepository>id::default::file:target/deploy</altDeploymentRepository>
-      </properties>
+      <id>setup-checkout</id>
+      <activation>
+        <file>
+          <missing>site-content</missing>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>prepare-checkout</id>
+                <phase>pre-site</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <exec executable="git">
+                      <arg line="clone -b gh-pages --single-branch ${site.publish.url} ${site.publish.checkout.directory}"/>
+                    </exec>
+
+                    <exec executable="git" dir="site-content">
+                      <arg line="fetch origin gh-pages"/>
+                    </exec>
+
+                    <exec executable="git" dir="site-content">
+                      <arg line="reset --hard origin/gh-pages"/>
+                    </exec>
+
+                    <pathconvert pathsep=" " property="dirs">
+                      <dirset dir="${site.publish.checkout.directory}" includes="*"/>
+                    </pathconvert>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>travis-jacoco</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>${jacoco.maven.plugin.version}</version>
+          </plugin>
+          <plugin>
+            <groupId>org.eluder.coveralls</groupId>
+            <artifactId>coveralls-maven-plugin</artifactId>
+            <version>${coveralls.maven.plugin.version}</version>
+            <configuration>
+              <timestampFormat>EpochMillis</timestampFormat>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>release</id>
       <build>
         <plugins>
-          <plugin>
-              <groupId>org.sonatype.plugins</groupId>
-              <artifactId>nexus-staging-maven-plugin</artifactId>
-              <version>1.6.8</version>
-              <extensions>true</extensions>
-              <configuration>
-                  <serverId>ossrh</serverId>
-                  <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                  <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                  <autoDropAfterRelease>true</autoDropAfterRelease>
-                  <stagingProfileId>26a9600c05a6d3</stagingProfileId>
-              </configuration>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -625,6 +612,19 @@
             <configuration>
               <source>1.8</source>
               <target>1.8</target>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.8</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+              <autoDropAfterRelease>true</autoDropAfterRelease>
+              <stagingProfileId>26a9600c05a6d3</stagingProfileId>
             </configuration>
           </plugin>
           <plugin>
@@ -673,72 +673,5 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>setup-checkout</id>
-      <activation>
-        <file>
-          <missing>site-content</missing>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>prepare-checkout</id>
-                <phase>pre-site</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <tasks>
-                    <exec executable="git">
-                      <arg line="clone -b gh-pages --single-branch ${site.publish.url} ${site.publish.checkout.directory}" />
-                    </exec>
-
-                    <exec executable="git" dir="site-content">
-                      <arg line="fetch origin gh-pages" />
-                    </exec>
-
-                    <exec executable="git" dir="site-content">
-                      <arg line="reset --hard origin/gh-pages" />
-                    </exec>
-
-                    <pathconvert pathsep=" " property="dirs">
-                      <dirset dir="${site.publish.checkout.directory}" includes="*" />
-                    </pathconvert>
-                  </tasks>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>travis-jacoco</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>${jacoco.maven.plugin.version}</version>
-          </plugin>
-          <plugin>
-            <groupId>org.eluder.coveralls</groupId>
-            <artifactId>coveralls-maven-plugin</artifactId>
-            <version>${coveralls.maven.plugin.version}</version>
-            <configuration>
-              <timestampFormat>EpochMillis</timestampFormat>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
-
-
-
 </project>

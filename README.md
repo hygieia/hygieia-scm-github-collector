@@ -1,54 +1,63 @@
----
-title: GitHub Collector
-tags:
-keywords:
-summary:
-sidebar: hygieia_sidebar
-permalink: github.html
----
+## Hygieia collector for Github
+
+[![Build Status](https://travis-ci.com/Hygieia/hygieia-scm-github-collector.svg?branch=master)](https://travis-ci.com/Hygieia/hygieia-scm-github-collector)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Hygieia_hygieia-scm-github-collector&metric=alert_status)](https://sonarcloud.io/dashboard?id=Hygieia_hygieia-scm-github-collector)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/Hygieia/hygieia-scm-github-collector.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Hygieia/hygieia-scm-github-collector/alerts/)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/Hygieia/hygieia-scm-github-collector.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Hygieia/hygieia-scm-github-collector/context:java)
+[![Maven Central](https://img.shields.io/maven-central/v/com.capitalone.dashboard/github-scm-collector.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.capitalone.dashboard%22%20AND%20a:%22github-scm-collector%22)
+[![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+<br>
+<br>
+
 Configure the GitHub Collector to display and monitor information (related to code contribution activities) on the Hygieia Dashboard, from the GitHub repository. Collect source code details from GitHub based on the repository URL and Branch for which you are configuring the collector. 
 
 The GitHub collector uses the GitHub REST API v3 for API requests.
 
 Hygieia uses Spring Boot to package the collector as an executable JAR file with dependencies.
 
+# Table of Contents
+* [Setup Instructions](#setup-instructions)
+* [Sample Application Properties](#sample-application-properties)
+* [Run collector with Docker](#run-collector-with-docker)
+
 ### Setup Instructions
 
 ## Fork and Clone the Collector 
 
-Fork and clone the GitHub Collector from the [GitHub repo](https://github.com/Hygieia/hygieia-scm-github-collector). 
+To configure the SCM GitHub Collector, execute the following steps:
 
-To configure the GitHub Collector, execute the following steps:
+*	**Step 1 - Artifact Preparation:**
 
-*   **Step 1: Change Directory**
+	Please review the two options in Step 1 to find the best fit for you. 
 
-Change the current working directory to the `hygieia-scm-github-collector` directory of your Hygieia source code installation.
+	***Option 1 - Download the artifact:***
 
-For example, in the Windows command prompt, run the following command:
+	You can download the SNAPSHOTs from the SNAPSHOT directory [here](https://oss.sonatype.org/content/repositories/snapshots/com/capitalone/dashboard/github-scm-collector/) or from the maven central repository [here](https://search.maven.org/artifact/com.capitalone.dashboard/github-scm-collector).  
 
-```bash
-cd C:\Users\[username]\hygieia-scm-github-collector
-```
+	***Option 2 - Build locally:***
 
-*   **Step 2: Run Maven Build**
+	To configure the SCM GitHub Collector, git clone the [SCM GitHub collector repo](https://github.com/Hygieia/hygieia-scm-github-collector).  Then, execute the following steps:
 
-Run the maven build to package the collector into an executable jar file:
+	To package the SCM GitHub collector source code into an executable JAR file, run the maven build from the `\hygieia-scm-github-collector` directory of your source code installation:
 
-```bash
-mvn install
-```
+	```bash
+	mvn install
+	```
 
-The output file `[collector name].jar` is generated in the `hygieia-scm-github-collector\target` folder.
+	The output file `[collector name].jar` is generated in the `hygieia-scm-github-collector\target` folder.
 
-*   **Step 3: Set Parameters in Application Properties File**
+	Once you have chosen an option in Step 1, please proceed: 
+
+*   **Step 2: Set Parameters in Application Properties File**
 
 Set the configurable parameters in the `application.properties` file to connect to the Dashboard MongoDB database instance, including properties required by the GitHub Collector.
 
 For information about sourcing the application properties file, refer to the [Spring Boot Documentation](http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#boot-features-external-config-application-property-files).
 
-To configure parameters for the GitHub Collector, refer to the sample [application.properties](#sample-application-properties-file) file.
+To configure parameters for the GitHub Collector, refer to the sample [application.properties](#sample-application-properties) section.
 
-*   **Step 4: Deploy the Executable File**
+*   **Step 3: Deploy the Executable File**
 
 To deploy the `[collector name].jar` file, change directory to `hygieia-scm-github-collector\target`, and then execute the following from the command prompt:
 
@@ -56,9 +65,9 @@ To deploy the `[collector name].jar` file, change directory to `hygieia-scm-gith
 java -jar [collector name].jar --spring.config.name=github --spring.config.location=[path to application.properties file]
 ```
 
-### Sample Application Properties File
+### Sample Application Properties
 
-The sample `application.properties` file lists parameter values to configure the GitHub Collector. Set the parameters based on your environment setup.
+The sample `application.properties` section lists parameter values to configure the GitHub Collector. Set the parameters based on your environment setup.
 
 ```properties
 	# Database Name
@@ -118,4 +127,20 @@ The sample `application.properties` file lists parameter values to configure the
 	# Github repository Read Timeout value in milliseconds, default value is 20000 (20s) 
 	github.readTimeout=
 ```
-**Note**: For information on generating your GitHub key for private repos, refer to [Encryption of Private Repos](../collectors.md#encryption-for-private-repos).
+## Run collector with Docker
+
+You can install Hygieia by using a docker image from docker hub. This section gives detailed instructions on how to download and run with Docker. 
+
+*	**Step 1: Download**
+
+	Navigate to the docker hub location of your collector [here](https://hub.docker.com/u/hygieiadoc) and download the latest image (most recent version is preferred).  Tags can also be used, if needed.
+
+*	**Step 2: Run with Docker**
+
+	```Docker run -e SKIP_PROPERTIES_BUILDER=true -v properties_location:/hygieia/config image_name```
+	
+	- <code>-e SKIP_PROPERTIES_BUILDER=true</code>  <br />
+	indicates whether you want to supply a properties file for the java application. If false/omitted, the script will build a properties file with default values
+	- <code>-v properties_location:/hygieia/config</code> <br />
+	if you want to use your own properties file that located outside of docker container, supply the path here. 
+		- Example: <code>-v /Home/User/Document/application.properties:/hygieia/config</code>

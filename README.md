@@ -23,8 +23,6 @@ Hygieia uses Spring Boot to package the collector as an executable JAR file with
 
 ### Setup Instructions
 
-## Fork and Clone the Collector 
-
 To configure the SCM GitHub Collector, execute the following steps:
 
 *	**Step 1 - Artifact Preparation:**
